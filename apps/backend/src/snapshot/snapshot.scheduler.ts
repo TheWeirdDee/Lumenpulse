@@ -48,7 +48,12 @@ export class SnapshotScheduler {
     const run = await this.jobHistory.start(JOB_NAME);
     try {
       const result = await this.generator.generateForYesterday();
-      await this.jobHistory.complete(run, result as Record<string, unknown>);
+      await this.jobHistory.complete(run, {
+        date: result.date.toISOString(),
+        assetRowsWritten: result.assetRowsWritten,
+        globalRowWritten: result.globalRowWritten,
+        durationMs: result.durationMs,
+      });
       this.logger.log(`Nightly snapshot job finished: ${JSON.stringify(result)}`);
     } catch (err) {
       // Log but don't rethrow — a failed snapshot job must not crash the process.
