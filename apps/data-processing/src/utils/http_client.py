@@ -1,8 +1,9 @@
-import time
-import random
 import logging
+import random
+import time
+from typing import Optional
+
 import requests
-from typing import Set, Optional
 
 logger = logging.getLogger("RobustHTTPClient")
 
@@ -25,7 +26,7 @@ class RobustHTTPClient(requests.Session):
         self,
         max_retries: int = 4,
         backoff_factor: float = 1.5,
-        status_forcelist: Optional[Set[int]] = None,
+        status_forcelist: Optional[set[int]] = None,
         failure_threshold: int = 5,
         recovery_timeout: float = 30.0,
     ):

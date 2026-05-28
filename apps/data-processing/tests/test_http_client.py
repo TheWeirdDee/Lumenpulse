@@ -1,8 +1,10 @@
 import time
+from unittest.mock import MagicMock, patch
+
 import pytest
 import requests
-from unittest.mock import MagicMock, patch
-from src.utils.http_client import RobustHTTPClient, CircuitBreakerOpenException
+
+from src.utils.http_client import CircuitBreakerOpenException, RobustHTTPClient
 
 
 def test_successful_request():
