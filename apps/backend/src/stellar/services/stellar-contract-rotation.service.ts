@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import type { ConfigType } from '@nestjs/config';
 import stellarConfig from '../config/stellar.config';
@@ -72,10 +72,11 @@ export class StellarContractRotationService {
     }
 
     // Step 1: Validate all new contract IDs before making any changes
-    const validationResults = await this.contractRotationService.validateContractIds(
-      updates,
-      'testnet', // Always validate against testnet during rotation
-    );
+    const validationResults =
+      await this.contractRotationService.validateContractIds(
+        updates,
+        'testnet', // Always validate against testnet during rotation
+      );
 
     const invalidResults = validationResults.filter((r) => !r.isValid);
     if (invalidResults.length > 0) {
@@ -91,7 +92,7 @@ export class StellarContractRotationService {
     // Note: In production, environment variables would be updated via a configuration
     // management system (e.g., managed environment, cloud provider, or config service).
     // This implementation provides a transactional wrapper for the actual rotation.
-    const updatedContracts = await this.applyContractUpdates(updates);
+    const updatedContracts = this.applyContractUpdates(updates);
 
     // Step 3: Create audit log entry
     const auditLog = await this.auditService.log(
@@ -132,17 +133,13 @@ export class StellarContractRotationService {
 
     for (const [key, value] of Object.entries(updates)) {
       if (value) {
-        const contractName = key as ContractName;
-        // In production, this would persist to a configuration store
-        // For now, we update the in-memory config
-        const contracts = this.stellarCfg.contracts as Record<
-          ContractName,
-          string | null
-        >;
-        contracts[contractName] = value;
-        updated[key] = value;
+        updated[key] = value as string;
       }
     }
+
+    // Persist runtime overrides via ConfigService so we don't mutate the
+    // frozen global config object exported from lib/config.ts.
+    this.configService.setStellarContractOverrides(updated);
 
     return updated;
   }
@@ -153,9 +150,14 @@ export class StellarContractRotationService {
    * @param contractNames - Names of contracts being updated
    * @returns Map of contract names to their current IDs
    */
-  private getPreviousContractValues(contractNames: ContractName[]): Record<string, string | null> {
+  private getPreviousContractValues(
+    contractNames: ContractName[],
+  ): Record<string, string | null> {
     const previous: Record<string, string | null> = {};
-    const contracts = this.stellarCfg.contracts as Record<ContractName, string | null>;
+    const contracts = this.stellarCfg.contracts as Record<
+      ContractName,
+      string | null
+    >;
 
     for (const name of contractNames) {
       previous[name] = contracts[name] ?? null;
