@@ -418,6 +418,12 @@ const envSchema = z
     STELLAR_RETRY_ATTEMPTS: z.coerce.number().int().min(0).default(3),
     STELLAR_RETRY_DELAY: z.coerce.number().int().min(0).default(1_000),
     STELLAR_SERVER_SECRET: z.string().min(1), // SECRET — never log
+    STELLAR_BALANCE_CACHE_TTL: z.coerce.number().int().min(1).default(30_000),
+    STELLAR_OPERATIONS_CACHE_TTL: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(15_000),
 
     // Soroban contract addresses (optional — null when not yet deployed)
     STELLAR_CONTRACT_LUMEN_TOKEN: z.string().trim().optional(),
@@ -442,7 +448,11 @@ const envSchema = z
     WEBHOOK_PROVIDERS: z.string().trim().optional(),
 
     SOROBAN_INGEST_SECRET: z.string().trim().optional(),
-    SOROBAN_TIMESTAMP_TOLERANCE_MS: z.coerce.number().int().min(1_000).optional(),
+    SOROBAN_TIMESTAMP_TOLERANCE_MS: z.coerce
+      .number()
+      .int()
+      .min(1_000)
+      .optional(),
 
     TELEGRAM_BOT_TOKEN: z.string().trim().optional(),
     METRICS_ALLOWED_IPS: z.string().trim().optional(),
@@ -849,9 +859,7 @@ const optionalSummary = [
   ],
   [
     'SOROBAN_TIMESTAMP_TOLERANCE_MS',
-    String(
-      parsedEnv.SOROBAN_TIMESTAMP_TOLERANCE_MS ?? 300_000,
-    ),
+    String(parsedEnv.SOROBAN_TIMESTAMP_TOLERANCE_MS ?? 300_000),
   ],
   [
     'TELEGRAM_BOT_TOKEN',
@@ -991,6 +999,8 @@ export const config = Object.freeze({
     timeout: parsedEnv.STELLAR_TIMEOUT,
     retryAttempts: parsedEnv.STELLAR_RETRY_ATTEMPTS,
     retryDelay: parsedEnv.STELLAR_RETRY_DELAY,
+    balanceCacheTTL: parsedEnv.STELLAR_BALANCE_CACHE_TTL,
+    operationsCacheTTL: parsedEnv.STELLAR_OPERATIONS_CACHE_TTL,
     serverSecret: new SecretString(parsedEnv.STELLAR_SERVER_SECRET),
     contracts: Object.freeze({
       lumenToken: parsedEnv.STELLAR_CONTRACT_LUMEN_TOKEN ?? null,
@@ -1000,7 +1010,6 @@ export const config = Object.freeze({
         parsedEnv.STELLAR_CONTRACT_CONTRIBUTOR_REGISTRY ?? null,
       matchingPool: parsedEnv.STELLAR_CONTRACT_MATCHING_POOL ?? null,
       treasury: parsedEnv.STELLAR_CONTRACT_TREASURY ?? null,
-      vestingWallet: parsedEnv.STELLAR_CONTRACT_VESTING_WALLET ?? null,
     }),
   }),
   auth: Object.freeze({
@@ -1021,8 +1030,7 @@ export const config = Object.freeze({
   }),
   soroban: Object.freeze({
     ingestSecret: parsedEnv.SOROBAN_INGEST_SECRET,
-    timestampToleranceMs:
-      parsedEnv.SOROBAN_TIMESTAMP_TOLERANCE_MS ?? 300_000,
+    timestampToleranceMs: parsedEnv.SOROBAN_TIMESTAMP_TOLERANCE_MS ?? 300_000,
   }),
   metrics: Object.freeze({
     allowedIps: Object.freeze(splitCsv(parsedEnv.METRICS_ALLOWED_IPS)),
