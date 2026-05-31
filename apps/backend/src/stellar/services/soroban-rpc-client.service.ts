@@ -126,7 +126,7 @@ export class SorobanRpcClientService {
       if (result.status === 'ERROR') {
         throw new SorobanRpcError(
           SorobanErrorCode.SUBMISSION_FAILED,
-          `Transaction submission failed: ${result.errorResult ?? 'Unknown'}`,
+          `Transaction submission failed: ${JSON.stringify(result.errorResult ?? 'Unknown')}`,
         );
       }
       return result;
@@ -246,7 +246,7 @@ export class SorobanRpcClientService {
         },
         (e) => {
           clearTimeout(id);
-          reject(e);
+          reject(new Error(e));
         },
       );
     });

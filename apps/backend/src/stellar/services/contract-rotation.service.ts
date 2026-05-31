@@ -1,13 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  StrKey,
-  Contract,
-  Keypair,
-  Account,
-  TransactionBuilder,
-  BASE_FEE,
-  rpc,
-} from '@stellar/stellar-sdk';
+import { StrKey, Keypair, rpc } from '@stellar/stellar-sdk';
 import { config } from '../../lib/config';
 import { ContractValidationResultDto } from '../dto/rotate-contract-ids.dto';
 import { SorobanRpcClientService } from './soroban-rpc-client.service';
