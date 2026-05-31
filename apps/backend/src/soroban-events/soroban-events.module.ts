@@ -18,6 +18,10 @@ import { ProjectRegistryEntity } from '../database/entities/project-registry.ent
     BullModule.registerQueue({ name: SOROBAN_EVENTS_QUEUE }),
   ],
   controllers: [SorobanEventsController],
-  providers: [SorobanEventsService, SorobanEventsProcessor, SorobanEventIngestionGuard],
+  providers: [
+    SorobanEventsService,
+    SorobanEventsProcessor,
+    SorobanEventIngestionGuard,
+  ],
 })
 export class SorobanEventsModule {}

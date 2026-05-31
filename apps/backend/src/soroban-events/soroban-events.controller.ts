@@ -8,9 +8,16 @@ import {
   Req,
   Logger,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiHeader,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { IngestSorobanEventDto } from './dto/ingest-soroban-event.dto';
+import { IngestSorobanEventResponseDto } from './dto/ingest-soroban-event-response.dto';
 import { SorobanEventsService } from './soroban-events.service';
 import { SorobanEventIngestionGuard } from './guards/soroban-event-ingestion.guard';
 import { VerifiedWebhookRequest } from './interfaces/soroban-webhook.interface';
