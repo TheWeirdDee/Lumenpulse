@@ -210,7 +210,8 @@ export class SorobanEventIndexerService {
     });
 
     // upsert: on conflict (tx_hash, event_index) do nothing — fully idempotent
-    await this.eventRepo.upsert(rows, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.eventRepo.upsert(rows as any[], {
       conflictPaths: ['txHash', 'eventIndex'],
       skipUpdateIfNoValuesChanged: true,
     });
